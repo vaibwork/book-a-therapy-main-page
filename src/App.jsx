@@ -32,7 +32,6 @@ function App() {
     clinic: import.meta.env.VITE_CLINIC_URL || "http://localhost:3001",
   };
 
-  const [showSettings, setShowSettings] = useState(false);
   const [customUrls, setCustomUrls] = useState(() => {
     const saved = localStorage.getItem("bt_custom_urls");
     if (saved) {
@@ -125,7 +124,7 @@ function App() {
   // Landing Page View
   if (showLanding) {
     return (
-      <div className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen">
+      <div className="transition-colors duration-300 min-h-screen flex flex-col">
         <Navbar theme={theme} setTheme={setTheme} />
         <HeroSection />
         <About />
@@ -133,7 +132,7 @@ function App() {
         {/* Portal Selection Section */}
         <section
           id="portals"
-          className="section portals bg-white dark:bg-slate-900 transition-colors duration-300"
+          className="section portals transition-colors duration-300"
         >
           <div className="section__inner">
             <div className="text-center" style={{ marginBottom: "56px" }}>
@@ -171,7 +170,7 @@ function App() {
                     className={`portal-card ${cardThemeClass}`}
                   >
                     <div className="portal-card__bar" />
-                    <div className="portal-card__body bg-white dark:bg-slate-800 dark:border-slate-700 transition-colors duration-300">
+                    <div className="portal-card__body transition-colors duration-300">
                       <div className="portal-card__header">
                         <div className="portal-card__icon">
                           <Icon className="w-5 h-5" />
@@ -181,11 +180,11 @@ function App() {
                         </span>
                       </div>
 
-                      <h3 className="portal-card__title dark:text-white">
+                      <h3 className="portal-card__title">
                         {portal.title}
                       </h3>
                       <p className="portal-card__subtitle">{portal.subtitle}</p>
-                      <p className="portal-card__desc dark:text-slate-400">
+                      <p className="portal-card__desc">
                         {portal.description}
                       </p>
 
@@ -197,7 +196,7 @@ function App() {
                           {portal.benefits.map((b) => (
                             <li
                               key={b}
-                              className="portal-card__list-item dark:text-slate-300"
+                              className="portal-card__list-item"
                             >
                               <Check className="portal-card__check w-4 h-4 flex-shrink-0 mt-0.5" />
                               <span>{b}</span>
@@ -377,63 +376,11 @@ function App() {
       {/* FOOTER */}
       <footer className="w-full border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-center sm:text-left text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               © {new Date().getFullYear()} Book a Therapy. All rights reserved.
             </p>
-
-            {import.meta.env.DEV && (
-              <button
-                onClick={() => setShowSettings((s) => !s)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-              >
-                <Settings2 className="h-3.5 w-3.5" />
-                Configure URLs
-                {showSettings ? (
-                  <ChevronUp className="h-3.5 w-3.5" />
-                ) : (
-                  <ChevronDown className="h-3.5 w-3.5" />
-                )}
-              </button>
-            )}
           </div>
-
-          <AnimatePresence>
-            {showSettings && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden"
-              >
-                <div className="mt-4 p-4 sm:p-5 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-slate-700">
-                  <p className="text-xs font-bold uppercase tracking-widest mb-4 text-gray-900 dark:text-white">
-                    Local Development Ports
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {[
-                      { key: "customer", label: "Customer Portal" },
-                      { key: "practitioner", label: "Practitioner Portal" },
-                      { key: "clinic", label: "Clinic Portal" },
-                    ].map(({ key, label }) => (
-                      <div key={key}>
-                        <label className="block text-[10px] font-bold uppercase tracking-wider mb-1 text-gray-700 dark:text-gray-300">
-                          {label}
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                          value={customUrls[key]}
-                          onChange={(e) => handleUrlChange(key, e.target.value)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </footer>
     </div>

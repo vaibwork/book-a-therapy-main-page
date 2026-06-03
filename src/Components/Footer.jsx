@@ -102,7 +102,7 @@ export default function Footer() {
             borderTop: "1px solid rgba(255,255,255,0.08)",
             padding: "28px 0",
             display: "flex",
-            justifyContent: "between",
+            justifyContent: "space-between",
             alignItems: "center",
             flexWrap: "wrap",
             gap: "24px",
@@ -147,10 +147,10 @@ export default function Footer() {
                 placeholder="Join our newsletter"
                 style={{
                   flex: "1",
-                  padding: "9px 14px",
+                  padding: "9px 18px",
                   backgroundColor: "rgba(255, 255, 255, 0.05)",
                   border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: "8px",
+                  borderRadius: "999px",
                   color: "#fff",
                   fontSize: "0.85rem",
                   outline: "none",
@@ -166,7 +166,8 @@ export default function Footer() {
                 style={{
                   border: "none",
                   cursor: "pointer",
-                  padding: "9px 18px",
+                  padding: "9px 20px",
+                  borderRadius: "999px"
                 }}
               >
                 Subscribe

@@ -1,12 +1,6 @@
 import {
-  Users,
-  Zap,
-  Shield,
-  CheckCircle,
-  MapPin,
-  Search,
-  Smile,
-  ArrowRight,
+  Users, Zap, Shield, CheckCircle,
+  MapPin, Search, Smile, ArrowRight,
 } from "lucide-react";
 
 export default function About() {
@@ -63,14 +57,15 @@ export default function About() {
 
   const stats = [
     { number: "5,000+", label: "Happy Clients" },
-    { number: "500+", label: "Certified Therapists" },
-    { number: "50+", label: "Cities Covered" },
-    { number: "10K+", label: "Sessions Completed" },
+    { number: "500+",   label: "Certified Therapists" },
+    { number: "50+",    label: "Cities Covered" },
+    { number: "10K+",   label: "Sessions Completed" },
   ];
 
   return (
-    <div className="bg-white dark:bg-slate-900 transition-colors duration-300">
-      {/* ─── HOW IT WORKS SECTION ─── */}
+    <div style={{ background: "var(--bg-primary)", transition: "background 0.3s, color 0.3s" }}>
+
+      {/* ─── HOW IT WORKS ─── */}
       <section id="services" className="section hiw">
         <div className="section__inner">
           <div className="text-center" style={{ marginBottom: "56px" }}>
@@ -88,14 +83,17 @@ export default function About() {
               return (
                 <div
                   key={index}
-                  className="hiw__card bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700"
+                  className="hiw__card"
+                  style={{ background: "var(--bg-card)", borderColor: "var(--border-color)" }}
                 >
                   <span className="hiw__step-num">Step {step.step}</span>
                   <div className="hiw__icon-wrap">
                     <Icon size={24} />
                   </div>
-                  <h3 className="hiw__title dark:text-white">{step.title}</h3>
-                  <p className="hiw__desc dark:text-slate-400">
+                  <h3 className="hiw__title" style={{ color: "var(--text-primary)" }}>
+                    {step.title}
+                  </h3>
+                  <p className="hiw__desc" style={{ color: "var(--text-muted)" }}>
                     {step.description}
                   </p>
                 </div>
@@ -105,8 +103,12 @@ export default function About() {
         </div>
       </section>
 
-      {/* ─── WHY CHOOSE US / CORE BENEFITS SECTION ─── */}
-      <section id="about" className="section benefits">
+      {/* ─── WHY CHOOSE US ─── */}
+      <section
+        id="about"
+        className="section benefits"
+        style={{ background: "var(--bg-secondary)" }}
+      >
         <div className="section__inner">
           <div className="text-center" style={{ marginBottom: "56px" }}>
             <span className="section__label">Why Choose Us</span>
@@ -117,22 +119,25 @@ export default function About() {
             </p>
           </div>
 
-          {/* Benefits Grid */}
           <div className="benefits__grid" style={{ marginBottom: "64px" }}>
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <div
                   key={index}
-                  className="benefit-card bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700"
+                  className="benefit-card"
+                  style={{
+                    background: "var(--bg-card)",
+                    borderColor: "var(--border-color)",
+                  }}
                 >
-                  <div className="benefit-card__icon bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-300">
+                  <div className="benefit-card__icon">
                     <Icon size={22} />
                   </div>
-                  <h3 className="benefit-card__title dark:text-white">
+                  <h3 className="benefit-card__title" style={{ color: "var(--text-primary)" }}>
                     {feature.title}
                   </h3>
-                  <p className="benefit-card__desc dark:text-slate-400">
+                  <p className="benefit-card__desc" style={{ color: "var(--text-muted)" }}>
                     {feature.description}
                   </p>
                 </div>
@@ -141,16 +146,12 @@ export default function About() {
           </div>
 
           {/* Stats Bar */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800/80 rounded-2xl p-8 md:p-10 shadow-sm border border-green-100/50 dark:border-slate-700">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="about-stats">
+            <div className="about-stats__grid">
               {stats.map((stat, index) => (
-                <div key={index} className="flex flex-col justify-center">
-                  <div className="text-3xl md:text-4xl font-extrabold text-green-600 dark:text-green-400 mb-1">
-                    {stat.number}
-                  </div>
-                  <div className="text-xs md:text-sm font-semibold text-gray-500 dark:text-slate-400">
-                    {stat.label}
-                  </div>
+                <div key={index} className="about-stats__item">
+                  <div className="about-stats__number">{stat.number}</div>
+                  <div className="about-stats__label">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -158,13 +159,11 @@ export default function About() {
         </div>
       </section>
 
-      {/* ─── PREMIUM GRADIENT CTA BANNER ─── */}
+      {/* ─── CTA BANNER ─── */}
       <section className="section cta-banner">
         <div className="cta-banner__inner">
-          {/* Floating glow circles */}
           <div className="cta-banner__circle cta-banner__circle--1" />
           <div className="cta-banner__circle cta-banner__circle--2" />
-
           <div className="cta-banner__content">
             <h3 className="cta-banner__heading">
               Ready to Experience Professional Wellness?
@@ -175,7 +174,7 @@ export default function About() {
             </p>
             <a
               href="#portals"
-              className="cta-banner__btn hover:scale-105 active:scale-95 transition-all"
+              className="cta-banner__btn"
             >
               Choose Your Portal
               <ArrowRight size={18} />
