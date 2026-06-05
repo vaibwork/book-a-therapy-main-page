@@ -38,7 +38,7 @@ export default function HeroSection() {
           className="font-bold text-white leading-tight select-none px-2 flex-shrink-0"
           style={{ 
             fontSize: 'clamp(2rem, 5.5vw, 4rem)', 
-            fontFamily: "'Fraunces', serif",
+            fontFamily: "'Manrope', sans-serif",
             textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
           }}
         >
