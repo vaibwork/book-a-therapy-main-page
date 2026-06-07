@@ -13,9 +13,14 @@ const PortalHub = ({ onBack, customUrls }) => {
       <nav className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-green-500">
-              <Heart className="h-4 w-4 text-white" />
-            </div>
+            <video
+              src="/WhatsApp Video 2026-06-05 at 10.09.25 PM (1).mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-[70px] w-[200px] object-contain block mix-blend-screen"
+            />
             <div>
               <span className="font-bold text-sm sm:text-base tracking-tight text-gray-900 dark:text-white">
                 Book a Therapy

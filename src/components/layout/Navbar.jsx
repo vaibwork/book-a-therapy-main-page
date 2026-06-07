@@ -7,29 +7,40 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { label: 'Services',   href: '#services' },
-    { label: 'About Us',   href: '#about' },
-    { label: 'Blogs',      href: '#blogs' },
+    { label: 'Services', href: '#services' },
+    { label: 'About Us', href: '#about' },
+    { label: 'Blogs', href: '#blogs' },
     { label: 'Gift Cards', href: '#gift-cards' },
-    { label: 'Contact',    href: '#contact' },
+    { label: 'Contact', href: '#contact' },
   ];
 
   return (
     <>
       <nav className="sticky top-0 z-50 w-full border-b border-[var(--nav-border)] bg-[var(--nav-bg)] backdrop-blur-[14px] transition-all duration-300">
-        <div className="nav-container flex items-center h-[68px] max-w-[1280px] mx-auto px-5 md:px-8">
-          {/* Logo - Left aligned, taking 1/3 space to help center nav links */}
+        <div className="nav-container flex items-center h-[100px] max-w-[1280px] mx-auto px-5 md:px-8">
+
+          {/* Logo */}
           <div className="flex-1 flex items-center">
             <a href="/" className="flex items-center no-underline">
-              <img
-                src="/new pic.jpeg"
-                alt="BookaTherapy"
-                className="h-[52px] w-auto object-contain block"
+              <video
+                src="/logo_final.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{
+                  height: '90px',
+                  width: '420px',
+                  objectFit: 'contain',
+                  display: 'block',
+                  mixBlendMode: theme === 'dark' ? 'screen' : 'multiply',
+                  marginLeft: '-80px',
+                }}
               />
             </a>
           </div>
 
-          {/* Desktop Nav Links - Centered */}
+          {/* Desktop Nav Links */}
           <div className="hidden min-[900px]:flex items-center gap-0.5 flex-shrink-0">
             {navItems.map((item) => (
               <a key={item.label} href={item.href} className="nav-pill">
@@ -38,7 +49,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Action Buttons - Right aligned, taking 1/3 space */}
+          {/* Action Buttons */}
           <div className="hidden min-[900px]:flex flex-1 items-center justify-end gap-2.5">
             <a href="http://localhost:3000/auth" className="nav-btn-login">
               Login
