@@ -333,7 +333,7 @@ img {
 .nav-container {
   max-width: 1280px;
   margin: 0 auto;
-  height: 68px;
+  height: 100px;
   display: flex;
   align-items: center;
   padding: 0 32px;

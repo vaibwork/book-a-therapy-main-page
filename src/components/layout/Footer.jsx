@@ -45,9 +45,14 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="footer__brand lg:col-span-1">
             <div className="footer__logo flex items-center gap-2.5 mb-3.5">
-              <div className="footer__logo-icon w-8 h-8 bg-[var(--accent)] rounded-lg flex items-center justify-center">
-                <Heart className="w-4 h-4 text-white" fill="white" />
-              </div>
+              <video
+                src="/WhatsApp Video 2026-06-05 at 10.09.25 PM (1).mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="h-20 w-[220px] object-contain block mix-blend-screen"
+              />
               <span className="footer__logo-name font-['Manrope',sans-serif] text-[1.05rem] font-bold text-white">BookATherapy</span>
             </div>
 
