@@ -43,20 +43,12 @@ export default function Footer() {
         {/* Top Section Grid */}
         <div className="footer__grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
           {/* Brand Column */}
-          <div className="footer__brand lg:col-span-1">
+          <div className="footer__brand lg:col-span-2">
             <div className="footer__logo flex items-center gap-2.5 mb-3.5">
-              <video
-                src="/WhatsApp Video 2026-06-05 at 10.09.25 PM (1).mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="h-20 w-[220px] object-contain block mix-blend-screen"
-              />
               <span className="footer__logo-name font-['Manrope',sans-serif] text-[1.05rem] font-bold text-white">BookATherapy</span>
             </div>
 
-            <p className="footer__brand-desc text-[0.85rem] leading-[1.65] text-white/55 mb-5">
+            <p className="footer__brand-desc text-[0.85rem] leading-[1.65] text-white/55 mb-5 max-w-[340px]">
               Canada's premier massage therapy platform, connecting clients with
               certified practitioners and clinics instantly.
             </p>

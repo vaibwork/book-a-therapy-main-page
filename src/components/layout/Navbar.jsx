@@ -34,7 +34,7 @@ export default function Navbar() {
                   objectFit: 'contain',
                   display: 'block',
                   mixBlendMode: theme === 'dark' ? 'screen' : 'multiply',
-                  marginLeft: '-80px',
+                  marginLeft: '0',
                 }}
               />
             </a>
