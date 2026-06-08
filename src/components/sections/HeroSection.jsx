@@ -12,11 +12,11 @@ export default function HeroSection() {
   };
 
   return (
-    <section 
-      className="hero relative min-h-[85vh] sm:min-h-[90vh] flex flex-col items-center justify-center transition-colors duration-300 px-4 sm:px-6 py-12 sm:py-20 overflow-hidden"
+    <section
+      className="hero relative min-h-[85vh] sm:min-h-[90vh] flex flex-col items-center justify-center transition-colors duration-300 px-4 sm:px-6 py-6 sm:py-12 overflow-hidden"
       style={{
         background: 'linear-gradient(rgba(10, 18, 36, 0.78), rgba(10, 18, 36, 0.92)), url("https://images.unsplash.com/photo-1600334129128-685c5582fd35?q=80&w=1600&auto=format&fit=crop") center/cover no-repeat',
-        paddingTop: 'clamp(90px, 12vw, 140px)'
+        PaddingTop: 'clamp(60px, 8vw, 100px)'
       }}
     >
       {/* Decorative glows overlaying the photo */}
@@ -34,10 +34,10 @@ export default function HeroSection() {
         </div>
 
         {/* Centered Headline */}
-        <h1 
+        <h1
           className="font-bold text-white leading-tight select-none px-2 flex-shrink-0"
-          style={{ 
-            fontSize: 'clamp(2rem, 5.5vw, 4rem)', 
+          style={{
+            fontSize: 'clamp(2rem, 5.5vw, 4rem)',
             fontFamily: "'Manrope', sans-serif",
             textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
           }}
@@ -55,15 +55,15 @@ export default function HeroSection() {
 
         {/* Centered CTAs */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 w-full sm:w-auto px-4 max-w-md sm:max-w-none flex-shrink-0">
-          <a 
-            href="#portals" 
+          <a
+            href="#portals"
             className="bg-[#98c454] hover:bg-[#87b043] text-slate-900 font-bold text-sm px-8 py-3.5 rounded-full transition-all shadow-md active:scale-95 text-center flex items-center justify-center min-w-[200px]"
             style={{ borderRadius: '100px' }}
           >
             Book a Massage Now
           </a>
-          <a 
-            href="#services" 
+          <a
+            href="#services"
             className="border border-white/30 hover:border-white text-white font-bold text-sm px-8 py-3.5 rounded-full transition-all backdrop-blur-sm shadow-sm text-center flex items-center justify-center min-w-[200px]"
             style={{ borderRadius: '100px' }}
           >
@@ -72,7 +72,7 @@ export default function HeroSection() {
         </div>
 
         {/* Centered Trust Indicators */}
-        <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-xs md:text-sm text-gray-300 px-4 flex-shrink-0">
+        <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-xs md:text-sm text-gray-300 px-4 mb-6 flex-shrink-0">
           <div className="flex items-center gap-2">
             <Check size={14} className="text-[#98c454]" />
             <span>Verified Therapists</span>
@@ -91,8 +91,8 @@ export default function HeroSection() {
       </div>
 
       {/* Bottom Location Bar (Overlayed & Responsive) */}
-      <div 
-        className="relative z-10 flex flex-wrap items-center justify-center gap-2 px-4 sm:px-6 py-3 border transition-all duration-300 text-xs sm:text-sm select-none rounded-2xl sm:rounded-full max-w-[90%] sm:max-w-none text-center flex-shrink-0"
+      <div
+        className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-2 px-4 sm:px-6 py-3 border transition-all duration-300 text-xs sm:text-sm select-none rounded-2xl sm:rounded-full max-w-[90%] sm:max-w-none text-center flex-shrink-0"
         style={{
           backgroundColor: 'rgba(255, 255, 255, 0.08)',
           borderColor: 'rgba(255, 255, 255, 0.15)',

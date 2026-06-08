@@ -1,6 +1,6 @@
 import {
   Users, Zap, Shield, CheckCircle,
-  MapPin, Search, Smile, ArrowRight,
+  MapPin, Search, Smile,
 } from "lucide-react";
 
 export default function About() {
@@ -71,7 +71,10 @@ export default function About() {
           <div className="text-center mb-14">
             <span className="section__label">Simple Steps</span>
             <h2 className="section__heading">How It Works</h2>
-            <p className="section__sub mx-auto text-center">
+            <p
+              className="section__sub mx-auto text-center"
+              style={{ textAlign: "center", marginLeft: "auto", marginRight: "auto" }}
+            >
               We've streamlined the entire process to connect you with top-tier
               wellness practitioners in a matter of clicks.
             </p>
@@ -111,7 +114,10 @@ export default function About() {
           <div className="text-center mb-14">
             <span className="section__label">Why Choose Us</span>
             <h2 className="section__heading">BookATherapy Core Benefits</h2>
-            <p className="section__sub mx-auto">
+            <p
+              className="section__sub mx-auto text-center"
+              style={{ textAlign: "center", marginLeft: "auto", marginRight: "auto" }}
+            >
               We are dedicated to making professional massage therapy
               accessible, transparent, and completely hassle-free.
             </p>
