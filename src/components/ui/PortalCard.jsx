@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 
-export const PortalCard = ({ portal, index, url }) => {
+export const PortalCard = ({ portal, index }) => {
   const Icon = portal.icon;
 
   return (
@@ -36,7 +36,7 @@ export const PortalCard = ({ portal, index, url }) => {
           </ul>
         </div>
 
-        <a href={url} className="portal-card__cta">
+        <a href={portal.path} className="portal-card__cta">
           Open Portal
           <ArrowRight className="w-4 h-4" />
         </a>
@@ -45,7 +45,7 @@ export const PortalCard = ({ portal, index, url }) => {
   );
 };
 
-export const PortalHubCard = ({ portal, index, theme, url }) => {
+export const PortalHubCard = ({ portal, index, theme }) => {
   const Icon = portal.icon;
   return (
     <motion.div
@@ -90,7 +90,7 @@ export const PortalHubCard = ({ portal, index, theme, url }) => {
         </div>
 
         <a
-          href={url}
+          href={portal.path}
           className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors"
         >
           Open Platform

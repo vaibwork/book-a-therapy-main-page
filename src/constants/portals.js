@@ -1,14 +1,9 @@
 import { Heart, UserCheck, Building2 } from "lucide-react";
 
-export const DEFAULT_URLS = {
-  customer: import.meta.env.VITE_CUSTOMER_URL || "http://localhost:3000",
-  practitioner: import.meta.env.VITE_PRACTITIONER_URL || "http://localhost:3002",
-  clinic: import.meta.env.VITE_CLINIC_URL || "http://localhost:3001",
-};
-
 export const PORTALS_DATA = [
   {
     id: "customer",
+    path: "/patient",
     title: "Customer Portal",
     subtitle: "For Patients & Clients",
     description:
@@ -28,6 +23,7 @@ export const PORTALS_DATA = [
   },
   {
     id: "practitioner",
+    path: "/practitioner",
     title: "Practitioner Portal",
     subtitle: "For Licensed Therapists",
     description:
@@ -47,6 +43,7 @@ export const PORTALS_DATA = [
   },
   {
     id: "clinic",
+    path: "/clinic",
     title: "Clinic Portal",
     subtitle: "For Clinics & Institutions",
     description:

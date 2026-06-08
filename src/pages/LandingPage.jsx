@@ -6,7 +6,7 @@ import { PortalCard } from "../components/ui/PortalCard";
 import { PORTALS_DATA } from "../constants/portals";
 import { useTheme } from "../context/ThemeContext";
 
-const LandingPage = ({ onOpenHub, customUrls }) => {
+const LandingPage = ({ onOpenHub }) => {
   const { theme, setTheme } = useTheme();
 
   return (
@@ -36,12 +36,7 @@ const LandingPage = ({ onOpenHub, customUrls }) => {
 
           <div className="portals__grid">
             {PORTALS_DATA.map((portal, i) => (
-              <PortalCard
-                key={portal.id}
-                portal={portal}
-                index={i}
-                url={customUrls[portal.id]}
-              />
+              <PortalCard key={portal.id} portal={portal} index={i} />
             ))}
           </div>
         </div>

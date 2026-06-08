@@ -2,6 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      // Portal redirects: /patient, /practitioner, /clinic forward instantly to their
+      // dedicated apps. This runs before the JS bundle loads, so there is no flash.
+      // Destinations are injected from VITE_* env at build time
+      // (.env.development for local dev, .env.production for live).
+      (function () {
+        var routes = {
+          "/patient": "%VITE_CUSTOMER_URL%",
+          "/practitioner": "%VITE_PRACTITIONER_URL%",
+          "/clinic": "%VITE_CLINIC_URL%",
+        };
+        var dest = routes[location.pathname.replace(/\/+$/, "")];
+        if (dest && dest.charAt(0) !== "%") location.replace(dest);
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book a Therapy Hub | Portal Selection</title>

@@ -4,7 +4,7 @@ import { useTheme } from "../context/ThemeContext";
 import { PortalHubCard } from "../components/ui/PortalCard";
 import { PORTALS_DATA } from "../constants/portals";
 
-const PortalHub = ({ onBack, customUrls }) => {
+const PortalHub = ({ onBack }) => {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -104,7 +104,6 @@ const PortalHub = ({ onBack, customUrls }) => {
               portal={portal}
               index={i}
               theme={theme}
-              url={customUrls[portal.id]}
             />
           ))}
         </div>
