@@ -83,6 +83,10 @@ body {
   line-height: 1.6;
   transition: background 0.35s, color 0.35s;
   overflow-x: hidden;
+  max-width: 100%;
+  /* Stop the left/right rubber-band wobble on mobile */
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
 }
 
 a {
