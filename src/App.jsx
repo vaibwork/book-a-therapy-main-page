@@ -1,22 +1,13 @@
-import { useState } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
-import LandingPage from "./pages/LandingPage";
-import PortalHub from "./pages/PortalHub";
+import WhoAreYou from "./pages/WhoAreYou";
 
-function AppContent() {
-  const [showLanding, setShowLanding] = useState(true);
-
-  if (showLanding) {
-    return <LandingPage onOpenHub={() => setShowLanding(false)} />;
-  }
-
-  return <PortalHub onBack={() => setShowLanding(true)} />;
-}
-
+// Minimal main page: a single "Who are you?" portal picker.
+// (The old marketing LandingPage / rich PortalHub remain in the repo but are
+// no longer mounted — restore them here if ever needed.)
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <WhoAreYou />
     </ThemeProvider>
   );
 }
