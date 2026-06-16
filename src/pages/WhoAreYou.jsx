@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Heart, UserCheck, Building2, ArrowRight } from "lucide-react";
+import logo from "../assets/logo.jpg";
 
 // Each card links to /patient, /practitioner or /clinic — the inline script in
 // index.html instantly redirects those paths to the live portals.
@@ -78,14 +79,17 @@ export default function WhoAreYou() {
         initial="hidden"
         animate="show"
       >
-        {/* Logo wordmark */}
-        <motion.div variants={fadeUp} className="wru-brand-wrap">
-          <div className="wru-brand">
-            <span>Book</span>
-            <span className="wru-brand-a">a</span>
-            <span>Therapy</span>
-          </div>
-          <div className="wru-tagline">Match. Relax. Thrive.</div>
+        {/* Logo */}
+        <motion.div
+          variants={fadeUp}
+          className="wru-logo-chip"
+          whileHover={{ y: -3 }}
+        >
+          <img
+            src={logo}
+            alt="BookaTherapy — Match. Relax. Thrive."
+            className="wru-logo"
+          />
         </motion.div>
 
         <motion.h1 variants={fadeUp} className="wru-title">
@@ -164,21 +168,19 @@ const CSS = `
     text-align: center;
   }
 
-  .wru-brand {
-    font-weight: 800;
-    font-size: clamp(1.9rem, 5vw, 2.8rem);
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-    line-height: 1;
+  .wru-logo-chip {
+    background: #ffffff;
+    padding: 16px 30px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    display: inline-flex;
   }
-  .wru-brand-a { color: var(--accent); }
-  .wru-tagline {
-    margin-top: 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent-dark);
+  .wru-logo {
+    width: clamp(210px, 42vw, 320px);
+    height: auto;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
   }
 
   .wru-title {
