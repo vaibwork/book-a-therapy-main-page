@@ -49,7 +49,10 @@ const ROLES = [
 ];
 
 const PARTICLE_COLORS = ["#98c454", "#252f4f", "#43829e", "#7ea63f"];
+const SPARK_COLORS = ["#ffffff", "#98c454", "#43829e", "#ffd76a", "#7ea63f"];
+const ROCKET_TRAILS = ["#ffffff", "#ffd76a", "#98c454", "#bfe0ee"];
 const COVER_BASE = 48; // px — base size of the erupting cover circle
+const HOLD_MS = 2450; // how long the blast-off screen shows before redirecting
 
 const containerVar = {
   hidden: {},
@@ -75,6 +78,7 @@ export default function WhoAreYou() {
   const controls = useAnimationControls();
   const [pick, setPick] = useState(null); // { id, name, dest, x, y, solid, scale }
   const [phase, setPhase] = useState("idle"); // idle -> cover -> loading
+  const [percent, setPercent] = useState(0);
 
   useEffect(() => {
     controls.start("show");
@@ -85,10 +89,26 @@ export default function WhoAreYou() {
     if (phase === "loading" && pick) {
       const t = setTimeout(() => {
         window.location.href = pick.dest;
-      }, 1900);
+      }, HOLD_MS);
       return () => clearTimeout(t);
     }
   }, [phase, pick]);
+
+  // Live percentage counter, animated with requestAnimationFrame.
+  useEffect(() => {
+    if (phase !== "loading") return;
+    let raf;
+    let start = null;
+    const D = HOLD_MS - 250;
+    const tick = (t) => {
+      if (start === null) start = t;
+      const p = Math.min(100, Math.round(((t - start) / D) * 100));
+      setPercent(p);
+      if (p < 100) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [phase]);
 
   const handlePick = (e, role) => {
     e.preventDefault();
@@ -104,7 +124,7 @@ export default function WhoAreYou() {
     controls.start("hide");
   };
 
-  // Evenly distribute particles on a jittered grid so there are no blank patches.
+  // Evenly distribute background particles on a jittered grid (no blank patches).
   const particles = useMemo(() => {
     const cols = 6;
     const rows = 5;
@@ -135,16 +155,66 @@ export default function WhoAreYou() {
     return list;
   }, []);
 
-  // Rocket fleet for the redirect screen.
+  // --- Blast-off screen elements ---
   const rockets = useMemo(() => {
     const r = (a, b) => a + Math.random() * (b - a);
-    return Array.from({ length: 11 }, (_, i) => ({
+    return Array.from({ length: 14 }, (_, i) => ({
       id: i,
-      left: +r(4, 92).toFixed(1),
-      size: Math.round(r(22, 46)),
-      dur: +r(1.5, 2.8).toFixed(2),
-      delay: +r(0, 1.5).toFixed(2),
-      drift: Math.round(r(-45, 65)),
+      left: +r(3, 93).toFixed(1),
+      size: Math.round(r(20, 48)),
+      dur: +r(1.4, 2.8).toFixed(2),
+      delay: +r(0, 1.6).toFixed(2),
+      drift: Math.round(r(-50, 70)),
+      trail: ROCKET_TRAILS[i % ROCKET_TRAILS.length],
+    }));
+  }, []);
+
+  const stars = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      left: +r(0, 100).toFixed(2),
+      top: +r(0, 100).toFixed(2),
+      size: +r(2, 5).toFixed(1),
+      color: Math.random() > 0.5 ? "#ffffff" : SPARK_COLORS[i % SPARK_COLORS.length],
+      dur: +r(1.4, 3.2).toFixed(2),
+      delay: +r(0, 3).toFixed(2),
+    }));
+  }, []);
+
+  const confetti = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      left: +r(0, 100).toFixed(2),
+      w: Math.round(r(6, 11)),
+      h: Math.round(r(8, 16)),
+      color: SPARK_COLORS[i % SPARK_COLORS.length],
+      spin: Math.round(r(360, 900)),
+      dur: +r(2.4, 4.6).toFixed(2),
+      delay: +r(0, 3).toFixed(2),
+      round: Math.random() > 0.6,
+    }));
+  }, []);
+
+  const fireworks = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return Array.from({ length: 3 }, (_, b) => ({
+      id: b,
+      left: +r(15, 85).toFixed(1),
+      top: +r(16, 64).toFixed(1),
+      delay: +r(0, 1.4).toFixed(2),
+      sparks: Array.from({ length: 11 }, (_, k) => {
+        const a = (k / 11) * Math.PI * 2 + r(-0.15, 0.15);
+        const rad = r(66, 116);
+        return {
+          k,
+          fx: Math.round(Math.cos(a) * rad),
+          fy: Math.round(Math.sin(a) * rad),
+          color: SPARK_COLORS[k % SPARK_COLORS.length],
+          d: +(Math.random() * 0.18).toFixed(2),
+        };
+      }),
     }));
   }, []);
 
@@ -270,7 +340,78 @@ export default function WhoAreYou() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="wru-launch-sky">
+          {/* Backdrop motion */}
+          <div className="wru-aurora" />
+          <div className="wru-launch-glow wru-launch-glow--1" />
+          <div className="wru-launch-glow wru-launch-glow--2" />
+
+          {/* Twinkling starfield */}
+          <div className="wru-layer">
+            {stars.map((s) => (
+              <span
+                key={s.id}
+                className="wru-star"
+                style={{
+                  left: `${s.left}%`,
+                  top: `${s.top}%`,
+                  width: s.size,
+                  height: s.size,
+                  background: s.color,
+                  animationDuration: `${s.dur}s`,
+                  animationDelay: `${s.delay}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Repeating firework bursts */}
+          <div className="wru-layer">
+            {fireworks.map((fw) => (
+              <div key={fw.id} className="wru-fw" style={{ left: `${fw.left}%`, top: `${fw.top}%` }}>
+                {fw.sparks.map((sp) => (
+                  <span
+                    key={sp.k}
+                    className="wru-fw-spark"
+                    style={{
+                      background: sp.color,
+                      boxShadow: `0 0 8px ${sp.color}`,
+                      "--fx": `${sp.fx}px`,
+                      "--fy": `${sp.fy}px`,
+                      animationDelay: `${(fw.delay + sp.d).toFixed(2)}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Falling confetti */}
+          <div className="wru-layer">
+            {confetti.map((c) => (
+              <span
+                key={c.id}
+                className="wru-confetti"
+                style={{
+                  left: `${c.left}%`,
+                  width: c.w,
+                  height: c.h,
+                  background: c.color,
+                  borderRadius: c.round ? "50%" : "2px",
+                  "--spin": `${c.spin}deg`,
+                  animationDuration: `${c.dur}s`,
+                  animationDelay: `${c.delay}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Shooting stars */}
+          <span className="wru-shoot" style={{ top: "12%", left: "8%", animationDelay: "0.2s" }} />
+          <span className="wru-shoot" style={{ top: "26%", left: "52%", animationDelay: "1.1s" }} />
+          <span className="wru-shoot" style={{ top: "6%", left: "70%", animationDelay: "1.8s" }} />
+
+          {/* Rocket fleet */}
+          <div className="wru-layer">
             {rockets.map((rk) => (
               <motion.div
                 key={rk.id}
@@ -286,20 +427,29 @@ export default function WhoAreYou() {
                   times: [0, 0.08, 0.6, 0.85, 1],
                 }}
               >
-                <span className="wru-rocket-trail" />
+                <span
+                  className="wru-rocket-trail"
+                  style={{ background: `linear-gradient(to bottom, ${rk.trail}, ${rk.trail}55 35%, transparent)` }}
+                />
                 <span className="wru-rocket-em">🚀</span>
               </motion.div>
             ))}
           </div>
 
+          {/* Centerpiece */}
           <motion.div
             className="wru-launch-center"
             initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.15, type: "spring", stiffness: 120, damping: 15 }}
+            transition={{ delay: 0.12, type: "spring", stiffness: 120, damping: 15 }}
           >
-            <div className="wru-launch-logo">
-              <img src={logo} alt="BookaTherapy" />
+            <div className="wru-logo-stage">
+              <span className="wru-center-aura" />
+              <span className="wru-ring wru-ring--1" />
+              <span className="wru-ring wru-ring--2" />
+              <div className="wru-launch-logo">
+                <img src={logo} alt="BookaTherapy" />
+              </div>
             </div>
             <div className="wru-launch-text">
               Taking you to the <strong>{pick.name}</strong> portal…
@@ -309,9 +459,11 @@ export default function WhoAreYou() {
                 className="wru-progress-fill"
                 initial={{ width: "0%" }}
                 animate={{ width: "100%" }}
-                transition={{ duration: 1.7, ease: "easeInOut" }}
+                transition={{ duration: (HOLD_MS - 250) / 1000, ease: "easeInOut" }}
               />
+              <span className="wru-progress-shine" />
             </div>
+            <div className="wru-percent">{percent}%</div>
             <div className="wru-launch-hint">Hold tight — almost there 🚀</div>
           </motion.div>
         </motion.div>
@@ -379,27 +531,54 @@ const CSS = `
   /* Cover circle erupting from the click */
   .wru-cover { position: fixed; width: 48px; height: 48px; border-radius: 50%; transform: translate(-50%, -50%); z-index: 50; pointer-events: none; }
 
-  /* Blast-off redirect screen */
-  .wru-launch {
-    position: fixed; inset: 0; z-index: 60; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    background-image: radial-gradient(120% 90% at 50% 115%, rgba(255,255,255,0.18), transparent 55%);
+  /* ---------- Blast-off redirect screen ---------- */
+  .wru-launch { position: fixed; inset: 0; z-index: 60; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .wru-layer { position: absolute; inset: 0; pointer-events: none; }
+
+  @keyframes wru-spin { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes wru-spin-rev { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(-360deg); } }
+  @keyframes wru-aura { 0%, 100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.45; } 50% { transform: translate(-50%, -50%) scale(1.18); opacity: 0.85; } }
+  @keyframes wru-pulse { 0%, 100% { transform: scale(0.9); opacity: 0.35; } 50% { transform: scale(1.2); opacity: 0.7; } }
+  @keyframes wru-twinkle { 0%, 100% { opacity: 0.15; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.25); } }
+  @keyframes wru-fall { from { transform: translateY(-14vh) rotate(0); } to { transform: translateY(116vh) rotate(var(--spin)); } }
+  @keyframes wru-firework { 0% { transform: translate(0, 0) scale(0.3); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--fx), var(--fy)) scale(1); opacity: 0; } }
+  @keyframes wru-shine { 0% { transform: translateX(-130%); } 100% { transform: translateX(360%); } }
+  @keyframes wru-shoot { 0% { opacity: 0; transform: translate(-12vw, -12vh) rotate(35deg); } 12% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; transform: translate(62vw, 62vh) rotate(35deg); } }
+  @keyframes wru-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .wru-aurora {
+    position: absolute; left: 50%; top: 50%; width: 170vmax; height: 170vmax;
+    background: conic-gradient(from 0deg, rgba(255,255,255,0), rgba(255,255,255,0.16), rgba(255,255,255,0) 28%, rgba(255,255,255,0.12) 52%, rgba(255,255,255,0) 78%, rgba(255,255,255,0.14) 92%, rgba(255,255,255,0));
+    mix-blend-mode: screen; animation: wru-spin 16s linear infinite; pointer-events: none;
   }
-  .wru-launch-sky { position: absolute; inset: 0; pointer-events: none; }
+  .wru-launch-glow { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+  .wru-launch-glow--1 { width: 50vmin; height: 50vmin; left: 12%; top: 18%; background: rgba(255,255,255,0.4); animation: wru-pulse 3.2s ease-in-out infinite; }
+  .wru-launch-glow--2 { width: 42vmin; height: 42vmin; right: 10%; bottom: 14%; background: rgba(255,255,255,0.3); animation: wru-pulse 4s ease-in-out infinite 0.6s; }
+
+  .wru-star { position: absolute; border-radius: 50%; box-shadow: 0 0 6px rgba(255,255,255,0.7); animation: wru-twinkle linear infinite; }
+  .wru-confetti { position: absolute; top: 0; animation: wru-fall linear infinite; }
+  .wru-fw { position: absolute; width: 0; height: 0; }
+  .wru-fw-spark { position: absolute; left: 0; top: 0; width: 7px; height: 7px; border-radius: 50%; animation: wru-firework 1.35s ease-out infinite; }
+  .wru-shoot { position: absolute; width: 150px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.95)); filter: drop-shadow(0 0 6px rgba(255,255,255,0.8)); animation: wru-shoot 2.6s ease-in infinite; }
+
   .wru-rocket { position: absolute; bottom: 0; will-change: transform; line-height: 1; }
   .wru-rocket-em { display: block; transform: rotate(-45deg); filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)); }
-  .wru-rocket-trail {
-    position: absolute; left: 50%; top: 55%; transform: translateX(-50%);
-    width: 6px; height: 90px; border-radius: 6px; filter: blur(2px);
-    background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.35) 35%, rgba(255,255,255,0));
-  }
+  .wru-rocket-trail { position: absolute; left: 50%; top: 55%; transform: translateX(-50%); width: 6px; height: 92px; border-radius: 6px; filter: blur(2px); }
 
   .wru-launch-center { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px; }
-  .wru-launch-logo { background: #fff; padding: 14px 24px; border-radius: 18px; box-shadow: 0 16px 50px rgba(0,0,0,0.25); }
-  .wru-launch-logo img { width: clamp(170px, 40vw, 250px); height: auto; display: block; }
-  .wru-launch-text { margin-top: 26px; color: #fff; font-size: clamp(1.05rem, 3.5vw, 1.4rem); font-weight: 600; text-shadow: 0 2px 14px rgba(0,0,0,0.25); }
+  .wru-logo-stage { position: relative; display: flex; align-items: center; justify-content: center; width: 300px; height: 300px; }
+  .wru-center-aura { position: absolute; left: 50%; top: 50%; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent 65%); filter: blur(6px); animation: wru-aura 2.4s ease-in-out infinite; }
+  .wru-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; pointer-events: none; }
+  .wru-ring--1 { width: 250px; height: 250px; border: 2px dashed rgba(255,255,255,0.55); animation: wru-spin 9s linear infinite; }
+  .wru-ring--2 { width: 300px; height: 300px; border: 2px dotted rgba(255,255,255,0.35); animation: wru-spin-rev 14s linear infinite; }
+  .wru-launch-logo { position: relative; z-index: 1; background: #fff; padding: 14px 24px; border-radius: 18px; box-shadow: 0 16px 50px rgba(0,0,0,0.28); animation: wru-bob 2.8s ease-in-out infinite; }
+  .wru-launch-logo img { width: clamp(160px, 38vw, 230px); height: auto; display: block; }
+
+  .wru-launch-text { margin-top: 22px; color: #fff; font-size: clamp(1.05rem, 3.5vw, 1.4rem); font-weight: 600; text-shadow: 0 2px 14px rgba(0,0,0,0.25); }
   .wru-launch-text strong { font-weight: 800; }
-  .wru-progress { margin-top: 20px; width: min(320px, 70vw); height: 7px; border-radius: 99px; background: rgba(255,255,255,0.3); overflow: hidden; }
-  .wru-progress-fill { height: 100%; border-radius: 99px; background: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.8); }
-  .wru-launch-hint { margin-top: 16px; color: rgba(255,255,255,0.9); font-size: 0.9rem; letter-spacing: 0.02em; }
+  .wru-progress { position: relative; margin-top: 20px; width: min(320px, 70vw); height: 8px; border-radius: 99px; background: rgba(255,255,255,0.3); overflow: hidden; }
+  .wru-progress-fill { height: 100%; border-radius: 99px; background: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.85); }
+  .wru-progress-shine { position: absolute; top: 0; left: 0; height: 100%; width: 38%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent); animation: wru-shine 1.1s ease-in-out infinite; }
+  .wru-percent { margin-top: 12px; color: #fff; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.02em; text-shadow: 0 2px 14px rgba(0,0,0,0.25); }
+  .wru-launch-hint { margin-top: 8px; color: rgba(255,255,255,0.92); font-size: 0.9rem; letter-spacing: 0.02em; }
 `;
