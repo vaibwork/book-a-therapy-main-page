@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Heart, UserCheck, Building2, ArrowRight } from "lucide-react";
 import logo from "../assets/logo.jpg";
@@ -37,6 +38,13 @@ const ROLES = [
   },
 ];
 
+const PARTICLE_COLORS = [
+  "var(--accent)",
+  "var(--navy)",
+  "var(--teal)",
+  "var(--accent-dark)",
+];
+
 const container = {
   hidden: {},
   show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
@@ -52,11 +60,33 @@ const fadeUp = {
 };
 
 export default function WhoAreYou() {
+  // Generate the floating brand-coloured circles once.
+  const particles = useMemo(() => {
+    const r = (min, max) => min + Math.random() * (max - min);
+    return Array.from({ length: 24 }, (_, i) => {
+      const size = Math.round(r(10, 72));
+      return {
+        id: i,
+        size,
+        left: r(0, 100),
+        top: r(0, 100),
+        color: PARTICLE_COLORS[i % PARTICLE_COLORS.length],
+        ring: Math.random() > 0.45,
+        blur: Math.random() > 0.75,
+        opacity: +r(0.12, 0.4).toFixed(2),
+        dur: +r(16, 34).toFixed(1),
+        delay: +(-r(0, 22)).toFixed(1),
+        dx: Math.round(r(40, 120)),
+        dy: Math.round(r(30, 100)),
+      };
+    });
+  }, []);
+
   return (
     <main className="wru-root">
       <style>{CSS}</style>
 
-      {/* Animated brand-coloured background blobs */}
+      {/* Ambient brand glow */}
       <motion.div
         className="wru-blob wru-blob--green"
         animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.12, 0.95, 1] }}
@@ -73,6 +103,34 @@ export default function WhoAreYou() {
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
 
+      {/* Floating particle circles */}
+      <div className="wru-particles" aria-hidden="true">
+        {particles.map((p) => (
+          <span
+            key={p.id}
+            className="wru-particle"
+            style={{
+              left: `${p.left}%`,
+              top: `${p.top}%`,
+              width: p.size,
+              height: p.size,
+              opacity: p.opacity,
+              filter: p.blur ? "blur(2px)" : "none",
+              ...(p.ring
+                ? {
+                    border: `${Math.max(1.5, p.size * 0.07)}px solid ${p.color}`,
+                    background: "transparent",
+                  }
+                : { background: p.color }),
+              "--dx": `${p.dx}px`,
+              "--dy": `${p.dy}px`,
+              "--dur": `${p.dur}s`,
+              "--delay": `${p.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
       <motion.div
         className="wru-content"
         variants={container}
@@ -80,11 +138,7 @@ export default function WhoAreYou() {
         animate="show"
       >
         {/* Logo */}
-        <motion.div
-          variants={fadeUp}
-          className="wru-logo-chip"
-          whileHover={{ y: -3 }}
-        >
+        <motion.div variants={fadeUp} className="wru-logo-chip" whileHover={{ y: -3 }}>
           <img
             src={logo}
             alt="BookaTherapy — Match. Relax. Thrive."
@@ -145,17 +199,35 @@ const CSS = `
       radial-gradient(1100px 600px at 50% -10%, var(--accent-light), transparent 60%),
       var(--bg-primary);
   }
+
+  /* Ambient glow blobs */
   .wru-blob {
     position: absolute;
     border-radius: 50%;
     filter: blur(70px);
-    opacity: 0.5;
+    opacity: 0.45;
     pointer-events: none;
     z-index: 0;
   }
   .wru-blob--green { width: 420px; height: 420px; background: var(--accent); top: -80px; left: -60px; }
-  .wru-blob--navy  { width: 380px; height: 380px; background: var(--navy);  bottom: -90px; right: -40px; opacity: 0.28; }
-  .wru-blob--teal  { width: 300px; height: 300px; background: var(--teal);  bottom: 10%; left: 8%; opacity: 0.3; }
+  .wru-blob--navy  { width: 380px; height: 380px; background: var(--navy);  bottom: -90px; right: -40px; opacity: 0.26; }
+  .wru-blob--teal  { width: 300px; height: 300px; background: var(--teal);  bottom: 10%; left: 8%; opacity: 0.28; }
+
+  /* Floating particle circles */
+  .wru-particles { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .wru-particle {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+    animation: wru-float var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+  @keyframes wru-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(var(--dx), calc(-1 * var(--dy))) scale(1.14); }
+    50% { transform: translate(calc(-0.6 * var(--dx)), calc(0.45 * var(--dy))) scale(0.9); }
+    75% { transform: translate(calc(0.45 * var(--dx)), var(--dy)) scale(1.06); }
+  }
 
   .wru-content {
     position: relative;
@@ -190,11 +262,7 @@ const CSS = `
     letter-spacing: -0.02em;
     color: var(--text-primary);
   }
-  .wru-sub {
-    margin-top: 10px;
-    font-size: 1.05rem;
-    color: var(--text-muted);
-  }
+  .wru-sub { margin-top: 10px; font-size: 1.05rem; color: var(--text-muted); }
 
   .wru-grid {
     margin-top: 38px;
@@ -246,14 +314,9 @@ const CSS = `
   .wru-card-cta svg { transition: transform 0.25s ease; }
   .wru-card:hover .wru-card-cta svg { transform: translateX(5px); }
 
-  .wru-foot {
-    margin-top: 34px;
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-  }
+  .wru-foot { margin-top: 34px; font-size: 0.8rem; letter-spacing: 0.04em; color: var(--text-muted); }
 
   @media (prefers-reduced-motion: reduce) {
-    .wru-blob { animation: none !important; }
+    .wru-blob, .wru-particle { animation: none !important; }
   }
 `;
