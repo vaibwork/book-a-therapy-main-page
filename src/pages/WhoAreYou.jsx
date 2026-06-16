@@ -222,6 +222,7 @@ export default function WhoAreYou() {
     <main className="wru-root">
       <style>{CSS}</style>
 
+      <div className="wru-bg" aria-hidden="true">
       {/* Ambient brand glow */}
       <motion.div
         className="wru-blob wru-blob--green"
@@ -265,6 +266,7 @@ export default function WhoAreYou() {
             transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut", delay: p.delay }}
           />
         ))}
+      </div>
       </div>
 
       <motion.div
@@ -479,13 +481,16 @@ const CSS = `
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 28px 20px;
-    overflow: hidden;
+    padding: 40px 20px;
+    overflow-x: hidden;
     font-family: 'Manrope', sans-serif;
     background:
       radial-gradient(1100px 600px at 50% -10%, var(--accent-light), transparent 60%),
       var(--bg-primary);
   }
+
+  /* Clips the decorative blobs/particles without trapping the page scroll on mobile */
+  .wru-bg { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
 
   .wru-blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; pointer-events: none; z-index: 0; }
   .wru-blob--green { width: 420px; height: 420px; background: var(--accent); top: -80px; left: -60px; }
@@ -501,13 +506,19 @@ const CSS = `
   }
 
   .wru-logo-chip { background: #ffffff; padding: 16px 30px; border-radius: 20px; box-shadow: var(--shadow-md); display: inline-flex; }
-  .wru-logo { width: clamp(210px, 42vw, 320px); height: auto; display: block; user-select: none; -webkit-user-drag: none; }
+  .wru-logo { width: clamp(180px, 44vw, 320px); height: auto; display: block; user-select: none; -webkit-user-drag: none; }
 
   .wru-title { margin-top: 34px; font-size: clamp(1.9rem, 5.5vw, 3rem); font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); }
   .wru-sub { margin-top: 10px; font-size: 1.05rem; color: var(--text-muted); }
 
   .wru-grid { margin-top: 38px; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-  @media (max-width: 720px) { .wru-grid { grid-template-columns: 1fr; max-width: 380px; margin-inline: auto; } }
+  @media (max-width: 720px) {
+    .wru-grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; margin-top: 26px; gap: 14px; }
+    .wru-title { margin-top: 24px; }
+    .wru-sub { font-size: 1rem; }
+    .wru-card { padding: 20px 18px; }
+    .wru-foot { margin-top: 24px; }
+  }
 
   .wru-card {
     position: relative; display: flex; flex-direction: column; gap: 12px;
@@ -566,11 +577,11 @@ const CSS = `
   .wru-rocket-trail { position: absolute; left: 50%; top: 55%; transform: translateX(-50%); width: 6px; height: 92px; border-radius: 6px; filter: blur(2px); }
 
   .wru-launch-center { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px; }
-  .wru-logo-stage { position: relative; display: flex; align-items: center; justify-content: center; width: 300px; height: 300px; }
-  .wru-center-aura { position: absolute; left: 50%; top: 50%; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent 65%); filter: blur(6px); animation: wru-aura 2.4s ease-in-out infinite; }
+  .wru-logo-stage { position: relative; display: flex; align-items: center; justify-content: center; width: min(300px, 72vmin); height: min(300px, 72vmin); }
+  .wru-center-aura { position: absolute; left: 50%; top: 50%; width: min(320px, 82vmin); height: min(320px, 82vmin); border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.7), transparent 65%); filter: blur(6px); animation: wru-aura 2.4s ease-in-out infinite; }
   .wru-ring { position: absolute; left: 50%; top: 50%; border-radius: 50%; pointer-events: none; }
-  .wru-ring--1 { width: 250px; height: 250px; border: 2px dashed rgba(255,255,255,0.55); animation: wru-spin 9s linear infinite; }
-  .wru-ring--2 { width: 300px; height: 300px; border: 2px dotted rgba(255,255,255,0.35); animation: wru-spin-rev 14s linear infinite; }
+  .wru-ring--1 { width: min(250px, 64vmin); height: min(250px, 64vmin); border: 2px dashed rgba(255,255,255,0.55); animation: wru-spin 9s linear infinite; }
+  .wru-ring--2 { width: min(300px, 76vmin); height: min(300px, 76vmin); border: 2px dotted rgba(255,255,255,0.35); animation: wru-spin-rev 14s linear infinite; }
   .wru-launch-logo { position: relative; z-index: 1; background: #fff; padding: 14px 24px; border-radius: 18px; box-shadow: 0 16px 50px rgba(0,0,0,0.28); animation: wru-bob 2.8s ease-in-out infinite; }
   .wru-launch-logo img { width: clamp(160px, 38vw, 230px); height: auto; display: block; }
 
