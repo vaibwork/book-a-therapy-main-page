@@ -1,120 +1,257 @@
+import { motion } from "framer-motion";
 import { Heart, UserCheck, Building2, ArrowRight } from "lucide-react";
 
-// Minimal "Who are you?" entry. Each card links to /patient, /practitioner or
-// /clinic — the inline script in index.html instantly redirects those paths to
-// the real portal URLs (from the VITE_* env), so there is no extra page.
+// Each card links to /patient, /practitioner or /clinic — the inline script in
+// index.html instantly redirects those paths to the live portals.
 const ROLES = [
   {
+    id: "patient",
     label: "I'm a Patient",
     desc: "Find therapists, book sessions and manage your care.",
     href: "/patient",
     Icon: Heart,
-    accent: "#16a34a",
+    accent: "var(--accent)",
+    glow: "rgba(152, 196, 84, 0.35)",
+    tint: "rgba(152, 196, 84, 0.12)",
   },
   {
+    id: "practitioner",
     label: "I'm a Practitioner",
     desc: "Manage appointments, clinical notes and your profile.",
     href: "/practitioner",
     Icon: UserCheck,
-    accent: "#2563eb",
+    accent: "var(--navy)",
+    glow: "rgba(37, 47, 79, 0.28)",
+    tint: "rgba(37, 47, 79, 0.10)",
   },
   {
+    id: "clinic",
     label: "I'm a Clinic",
-    desc: "Run your clinic, your team and all bookings.",
+    desc: "Run your clinic, your team and all your bookings.",
     href: "/clinic",
     Icon: Building2,
-    accent: "#0891b2",
+    accent: "var(--teal)",
+    glow: "rgba(67, 130, 158, 0.3)",
+    tint: "rgba(67, 130, 158, 0.12)",
   },
 ];
 
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 26 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 110, damping: 16 },
+  },
+};
+
 export default function WhoAreYou() {
   return (
-    <main
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px",
-        fontFamily: "'Manrope', sans-serif",
-        background: "#f7f8fb",
-        color: "#252F4F",
-        textAlign: "center",
-      }}
-    >
-      <style>{`
-        .wru-card { transition: transform .15s ease, box-shadow .15s ease; }
-        .wru-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(37,47,79,.16); }
-        .wru-card:active { transform: translateY(-1px); }
-      `}</style>
+    <main className="wru-root">
+      <style>{CSS}</style>
 
-      <div style={{ fontWeight: 800, letterSpacing: ".02em", fontSize: "1.05rem", marginBottom: "6px" }}>
-        BookaTherapy
-      </div>
-      <h1 style={{ fontSize: "clamp(1.6rem,4vw,2.4rem)", fontWeight: 800, margin: "0 0 6px" }}>
-        Who are you?
-      </h1>
-      <p style={{ margin: "0 0 28px", color: "#5b6478", fontSize: "1rem" }}>
-        Choose your portal to continue.
-      </p>
+      {/* Animated brand-coloured background blobs */}
+      <motion.div
+        className="wru-blob wru-blob--green"
+        animate={{ x: [0, 40, -20, 0], y: [0, -30, 20, 0], scale: [1, 1.12, 0.95, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="wru-blob wru-blob--navy"
+        animate={{ x: [0, -50, 25, 0], y: [0, 30, -25, 0], scale: [1, 0.9, 1.1, 1] }}
+        transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="wru-blob wru-blob--teal"
+        animate={{ x: [0, 30, -30, 0], y: [0, -20, 25, 0], scale: [1, 1.08, 0.92, 1] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+      />
 
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "16px",
-          width: "100%",
-          maxWidth: "880px",
-          justifyContent: "center",
-        }}
+      <motion.div
+        className="wru-content"
+        variants={container}
+        initial="hidden"
+        animate="show"
       >
-        {ROLES.map(({ label, desc, href, Icon, accent }) => (
-          <a
-            key={href}
-            href={href}
-            className="wru-card"
-            style={{
-              flex: "1 1 240px",
-              maxWidth: "280px",
-              minWidth: "220px",
-              background: "#fff",
-              borderRadius: "18px",
-              padding: "22px",
-              textDecoration: "none",
-              color: "inherit",
-              border: "1px solid #eceef3",
-              boxShadow: "0 6px 20px rgba(37,47,79,.06)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-              textAlign: "left",
-            }}
-          >
-            <span
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: `${accent}1a`,
-                color: accent,
-              }}
+        {/* Logo wordmark */}
+        <motion.div variants={fadeUp} className="wru-brand-wrap">
+          <div className="wru-brand">
+            <span>Book</span>
+            <span className="wru-brand-a">a</span>
+            <span>Therapy</span>
+          </div>
+          <div className="wru-tagline">Match. Relax. Thrive.</div>
+        </motion.div>
+
+        <motion.h1 variants={fadeUp} className="wru-title">
+          Who are you?
+        </motion.h1>
+        <motion.p variants={fadeUp} className="wru-sub">
+          Choose your portal to continue.
+        </motion.p>
+
+        <motion.div className="wru-grid" variants={container}>
+          {ROLES.map(({ id, label, desc, href, Icon, accent, glow, tint }) => (
+            <motion.a
+              key={id}
+              href={href}
+              className="wru-card"
+              variants={fadeUp}
+              whileHover={{ y: -8, boxShadow: `0 26px 52px ${glow}` }}
+              whileTap={{ scale: 0.985 }}
+              style={{ "--card-accent": accent, "--card-tint": tint }}
             >
-              <Icon size={26} />
-            </span>
-            <span style={{ fontSize: "1.15rem", fontWeight: 700 }}>{label}</span>
-            <span style={{ color: "#5b6478", fontSize: ".92rem", lineHeight: 1.45, flex: 1 }}>
-              {desc}
-            </span>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: accent, fontWeight: 700, fontSize: ".9rem" }}>
-              Continue <ArrowRight size={16} />
-            </span>
-          </a>
-        ))}
-      </div>
+              <span className="wru-card-bar" />
+              <span className="wru-card-icon">
+                <Icon size={26} strokeWidth={2.2} />
+              </span>
+              <span className="wru-card-title">{label}</span>
+              <span className="wru-card-desc">{desc}</span>
+              <span className="wru-card-cta">
+                Continue <ArrowRight size={17} />
+              </span>
+            </motion.a>
+          ))}
+        </motion.div>
+
+        <motion.div variants={fadeUp} className="wru-foot">
+          Secure portal access · BookaTherapy
+        </motion.div>
+      </motion.div>
     </main>
   );
 }
+
+const CSS = `
+  .wru-root {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px;
+    overflow: hidden;
+    font-family: 'Manrope', sans-serif;
+    background:
+      radial-gradient(1100px 600px at 50% -10%, var(--accent-light), transparent 60%),
+      var(--bg-primary);
+  }
+  .wru-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wru-blob--green { width: 420px; height: 420px; background: var(--accent); top: -80px; left: -60px; }
+  .wru-blob--navy  { width: 380px; height: 380px; background: var(--navy);  bottom: -90px; right: -40px; opacity: 0.28; }
+  .wru-blob--teal  { width: 300px; height: 300px; background: var(--teal);  bottom: 10%; left: 8%; opacity: 0.3; }
+
+  .wru-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .wru-brand {
+    font-weight: 800;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .wru-brand-a { color: var(--accent); }
+  .wru-tagline {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+  }
+
+  .wru-title {
+    margin-top: 34px;
+    font-size: clamp(1.9rem, 5.5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .wru-sub {
+    margin-top: 10px;
+    font-size: 1.05rem;
+    color: var(--text-muted);
+  }
+
+  .wru-grid {
+    margin-top: 38px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 720px) { .wru-grid { grid-template-columns: 1fr; max-width: 380px; margin-inline: auto; } }
+
+  .wru-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 26px 22px 22px;
+    border-radius: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+    text-align: left;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+  .wru-card:hover { border-color: var(--card-accent); }
+  .wru-card-bar {
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: var(--card-accent);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .wru-card:hover .wru-card-bar { transform: scaleX(1); }
+
+  .wru-card-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--card-tint); color: var(--card-accent);
+    transition: transform 0.25s ease;
+  }
+  .wru-card:hover .wru-card-icon { transform: scale(1.08) rotate(-4deg); }
+
+  .wru-card-title { font-size: 1.18rem; font-weight: 700; color: var(--text-primary); }
+  .wru-card-desc { font-size: 0.92rem; line-height: 1.5; color: var(--text-muted); flex: 1; }
+  .wru-card-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.9rem; font-weight: 700; color: var(--card-accent);
+  }
+  .wru-card-cta svg { transition: transform 0.25s ease; }
+  .wru-card:hover .wru-card-cta svg { transform: translateX(5px); }
+
+  .wru-foot {
+    margin-top: 34px;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wru-blob { animation: none !important; }
+  }
+`;
