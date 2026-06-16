@@ -52,7 +52,7 @@ const PARTICLE_COLORS = ["#98c454", "#252f4f", "#43829e", "#7ea63f"];
 const SPARK_COLORS = ["#ffffff", "#98c454", "#43829e", "#ffd76a", "#7ea63f"];
 const ROCKET_TRAILS = ["#ffffff", "#ffd76a", "#98c454", "#bfe0ee"];
 const COVER_BASE = 48; // px — base size of the erupting cover circle
-const HOLD_MS = 2450; // how long the blast-off screen shows before redirecting
+const HOLD_MS = 4000; // how long the blast-off screen shows before redirecting
 
 const containerVar = {
   hidden: {},
