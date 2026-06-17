@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
-import { Heart, UserCheck, Building2, ArrowRight } from "lucide-react";
+import { Heart, UserCheck, Building2, ArrowRight, ArrowLeft } from "lucide-react";
 import logo from "../assets/logo.jpg";
 
 // Real portal destinations (baked in at build from .env.production). The /patient
@@ -53,6 +53,8 @@ const SPARK_COLORS = ["#ffffff", "#98c454", "#43829e", "#ffd76a", "#7ea63f"];
 const ROCKET_TRAILS = ["#ffffff", "#ffd76a", "#98c454", "#bfe0ee"];
 const COVER_BASE = 48; // px — base size of the erupting cover circle
 const HOLD_MS = 4000; // how long the blast-off screen shows before redirecting
+const PORTAL_KEY = "bt_portal"; // remembered role id (localStorage)
+const SKIP_KEY = "bt_skip_auto"; // session flag: show the picker instead of auto-launching
 
 const containerVar = {
   hidden: {},
@@ -80,14 +82,38 @@ export default function WhoAreYou() {
   const [phase, setPhase] = useState("idle"); // idle -> cover -> loading
   const [percent, setPercent] = useState(0);
 
+  // Remembered portal: if the user picked one before, jump straight to its launch
+  // screen on open — unless they stepped back to the picker earlier this session.
   useEffect(() => {
-    controls.start("show");
+    let saved = null;
+    try {
+      if (sessionStorage.getItem(SKIP_KEY) !== "1") saved = localStorage.getItem(PORTAL_KEY);
+    } catch {
+      /* storage blocked */
+    }
+    const role = saved ? ROLES.find((r) => r.id === saved) : null;
+    if (role) {
+      const x = window.innerWidth / 2;
+      const y = window.innerHeight / 2;
+      const scale = (Math.hypot(x, y) * 2) / COVER_BASE + 1.3;
+      setPick({ id: role.id, name: role.name, dest: DEST[role.id], x, y, solid: role.solid, scale });
+      setPhase("loading");
+      controls.set("hide");
+    } else {
+      controls.start("show");
+    }
   }, [controls]);
 
   // After the cover circle fills the screen, hold the rocket screen briefly, then go.
   useEffect(() => {
     if (phase === "loading" && pick) {
       const t = setTimeout(() => {
+        // Mark this session so coming back to the hub shows the picker (no redirect loop).
+        try {
+          sessionStorage.setItem(SKIP_KEY, "1");
+        } catch {
+          /* ignore */
+        }
         window.location.href = pick.dest;
       }, HOLD_MS);
       return () => clearTimeout(t);
@@ -120,8 +146,27 @@ export default function WhoAreYou() {
     const far = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y));
     const scale = (far * 2) / COVER_BASE + 1.3;
     setPick({ id: role.id, name: role.name, dest: DEST[role.id], x, y, solid: role.solid, scale });
+    try {
+      localStorage.setItem(PORTAL_KEY, role.id); // remember for next time
+    } catch {
+      /* ignore */
+    }
     setPhase("cover");
     controls.start("hide");
+  };
+
+  // "Back to portals": cancel the redirect, forget the saved choice, show the picker.
+  const handleBack = () => {
+    try {
+      localStorage.removeItem(PORTAL_KEY);
+      sessionStorage.setItem(SKIP_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    setPick(null);
+    setPhase("idle");
+    setPercent(0);
+    controls.start("show");
   };
 
   // Evenly distribute background particles on a jittered grid (no blank patches).
@@ -470,6 +515,10 @@ export default function WhoAreYou() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
+          <button type="button" className="wru-back" onClick={handleBack} aria-label="Back to portals">
+            <ArrowLeft size={18} /> Back to portals
+          </button>
+
           {/* Backdrop motion */}
           <div className="wru-aurora" />
           <div className="wru-launch-glow wru-launch-glow--1" />
@@ -696,6 +745,18 @@ const CSS = `
   /* ---------- Blast-off redirect screen ---------- */
   .wru-launch { position: fixed; inset: 0; z-index: 60; overflow: hidden; display: flex; align-items: center; justify-content: center; }
   .wru-layer { position: absolute; inset: 0; pointer-events: none; }
+  .wru-back {
+    position: absolute; z-index: 6;
+    top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left));
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 15px 9px 11px; border-radius: 99px;
+    border: 1.5px solid rgba(255,255,255,0.6); background: rgba(255,255,255,0.16);
+    color: #fff; font-family: 'Manrope', sans-serif; font-size: 0.85rem; font-weight: 700;
+    cursor: pointer; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .wru-back:hover { background: rgba(255,255,255,0.3); }
+  .wru-back:active { transform: scale(0.96); }
 
   @keyframes wru-spin { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(360deg); } }
   @keyframes wru-spin-rev { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(-360deg); } }
