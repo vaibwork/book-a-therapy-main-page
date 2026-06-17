@@ -1,0 +1,59 @@
+# Codemagic CI/CD — builds & ships the BookaTherapy HUB iOS app from the cloud (no Mac needed).
+# Docs: https://docs.codemagic.io/yaml-quick-start/building-a-capacitor-app/
+#
+# ONE-TIME SETUP (in the Codemagic web UI), see CAPACITOR_APP_GUIDE.md §iOS:
+#   1. Apple Developer account ($99/yr) + create the app in App Store Connect (bundle id below).
+#   2. Codemagic → Teams → Integrations → App Store Connect → add an API key.
+#      Name it EXACTLY "CodemagicAppStoreKey" (or change the name under `integrations` below).
+#   3. Connect this GitHub repo to Codemagic and run the "ios-release" workflow.
+
+workflows:
+  ios-release:
+    name: BookaTherapy Hub iOS (App Store / TestFlight)
+    instance_type: mac_mini_m2          # Codemagic cloud Mac (free tier eligible)
+    max_build_duration: 60
+    cache:
+      cache_paths:
+        - $HOME/.npm
+        - node_modules
+    integrations:
+      app_store_connect: CodemagicAppStoreKey   # <-- must match the API key name you add in Codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.bookatherapy.hub
+      vars:
+        BUNDLE_ID: "com.bookatherapy.hub"
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
+        XCODE_SCHEME: "App"
+        # APP_STORE_APPLE_ID: 0000000000   # (optional) your app's numeric Apple ID from App Store Connect
+      node: 20
+      xcode: latest
+    scripts:
+      - name: Install JS dependencies
+        script: |
+          if [ -f yarn.lock ]; then yarn install --frozen-lockfile; else npm ci || npm install; fi
+      - name: Build web assets & sync Capacitor (iOS)
+        script: |
+          npm run build
+          npx cap sync ios
+      - name: Auto-increment build number (so re-uploads never collide)
+        script: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "ios/App/App/Info.plist"
+      - name: Set up code signing (automatic, via App Store Connect API key)
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+      - name: Build signed IPA
+        script: |
+          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true        # auto-upload to TestFlight after a green build
+        # submit_to_app_store: false       # flip to true when ready for public release review
