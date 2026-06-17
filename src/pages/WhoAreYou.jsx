@@ -127,7 +127,7 @@ export default function WhoAreYou() {
   // Evenly distribute background particles on a jittered grid (no blank patches).
   const particles = useMemo(() => {
     const cols = 6;
-    const rows = 5;
+    const rows = 6;
     const r = (min, max) => min + Math.random() * (max - min);
     const list = [];
     let i = 0;
@@ -153,6 +153,60 @@ export default function WhoAreYou() {
       }
     }
     return list;
+  }, []);
+
+  // Rising spa bubbles that drift up the whole page.
+  const bubbles = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return Array.from({ length: 16 }, (_, i) => ({
+      id: i,
+      left: +r(0, 100).toFixed(2),
+      size: Math.round(r(8, 30)),
+      color: PARTICLE_COLORS[i % PARTICLE_COLORS.length],
+      fill: Math.random() > 0.55,
+      bo: +r(0.12, 0.34).toFixed(2),
+      sway: Math.round(r(-34, 34)),
+      dur: +r(9, 18).toFixed(1),
+      delay: +(-r(0, 16)).toFixed(1),
+    }));
+  }, []);
+
+  // Expanding "ripple" rings emanating from a few calm points.
+  const ripples = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    const spots = [
+      { left: 18, top: 28 },
+      { left: 84, top: 22 },
+      { left: 50, top: 80 },
+    ];
+    const list = [];
+    spots.forEach((s, si) => {
+      const color = PARTICLE_COLORS[si % PARTICLE_COLORS.length];
+      const size = Math.round(r(240, 360));
+      const dur = +r(5, 8).toFixed(1);
+      for (let k = 0; k < 2; k++) {
+        list.push({ id: `${si}-${k}`, left: s.left, top: s.top, size, color, dur, delay: +(-k * (dur / 2)).toFixed(1) });
+      }
+    });
+    return list;
+  }, []);
+
+  // Two slow orbit systems with dots circling an invisible centre.
+  const orbits = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return [
+      { id: 0, left: 22, top: 66, d: Math.round(r(180, 240)), dur: Math.round(r(26, 34)), rev: false },
+      { id: 1, left: 80, top: 38, d: Math.round(r(150, 210)), dur: Math.round(r(30, 40)), rev: true },
+    ].map((o) => ({
+      ...o,
+      dots: Array.from({ length: 4 }, (_, k) => ({
+        k,
+        angle: Math.round((k / 4) * 360 + r(-12, 12)),
+        size: Math.round(r(7, 14)),
+        color: PARTICLE_COLORS[k % PARTICLE_COLORS.length],
+        op: +r(0.3, 0.6).toFixed(2),
+      })),
+    }));
   }, []);
 
   // --- Blast-off screen elements ---
@@ -265,6 +319,80 @@ export default function WhoAreYou() {
             }}
             transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut", delay: p.delay }}
           />
+        ))}
+      </div>
+
+      {/* Rising spa bubbles */}
+      <div className="wru-bubbles" aria-hidden="true">
+        {bubbles.map((b) => (
+          <span
+            key={b.id}
+            className="wru-bubble"
+            style={{
+              left: `${b.left}%`,
+              width: b.size,
+              height: b.size,
+              "--bo": b.bo,
+              "--sway": `${b.sway}px`,
+              animationDuration: `${b.dur}s`,
+              animationDelay: `${b.delay}s`,
+              ...(b.fill
+                ? { background: b.color }
+                : { border: `1.5px solid ${b.color}`, background: "transparent" }),
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Expanding ripple rings */}
+      <div className="wru-ripples" aria-hidden="true">
+        {ripples.map((rp) => (
+          <span
+            key={rp.id}
+            className="wru-ripple"
+            style={{
+              left: `${rp.left}%`,
+              top: `${rp.top}%`,
+              width: rp.size,
+              height: rp.size,
+              borderColor: rp.color,
+              animationDuration: `${rp.dur}s`,
+              animationDelay: `${rp.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Orbiting dot systems */}
+      <div className="wru-orbits" aria-hidden="true">
+        {orbits.map((o) => (
+          <div
+            key={o.id}
+            className="wru-orbit"
+            style={{
+              left: `${o.left}%`,
+              top: `${o.top}%`,
+              width: o.d,
+              height: o.d,
+              animationName: o.rev ? "wru-orbit-rev" : "wru-orbit",
+              animationDuration: `${o.dur}s`,
+            }}
+          >
+            <span className="wru-orbit-path" />
+            {o.dots.map((dt) => (
+              <span
+                key={dt.k}
+                className="wru-orbit-dot"
+                style={{
+                  width: dt.size,
+                  height: dt.size,
+                  color: dt.color,
+                  opacity: dt.op,
+                  transform: `translate(-50%, -50%) rotate(${dt.angle}deg) translateY(-${o.d / 2}px)`,
+                }}
+              />
+            ))}
+          </div>
         ))}
       </div>
       </div>
@@ -499,6 +627,29 @@ const CSS = `
 
   .wru-particles { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
   .wru-particle { position: absolute; border-radius: 50%; will-change: transform, opacity; }
+
+  .wru-bubbles, .wru-ripples, .wru-orbits { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+
+  @keyframes wru-rise {
+    0% { transform: translate(0, 110vh) scale(0.6); opacity: 0; }
+    12% { opacity: var(--bo); }
+    50% { transform: translate(var(--sway), 50vh) scale(1); }
+    88% { opacity: var(--bo); }
+    100% { transform: translate(0, -15vh) scale(1.12); opacity: 0; }
+  }
+  .wru-bubble { position: absolute; bottom: 0; border-radius: 50%; animation: wru-rise linear infinite; will-change: transform, opacity; }
+
+  @keyframes wru-ripple {
+    0% { transform: translate(-50%, -50%) scale(0.15); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  }
+  .wru-ripple { position: absolute; border-radius: 50%; border: 2px solid; transform: translate(-50%, -50%); animation: wru-ripple ease-out infinite; will-change: transform, opacity; }
+
+  @keyframes wru-orbit { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes wru-orbit-rev { from { transform: translate(-50%, -50%) rotate(0); } to { transform: translate(-50%, -50%) rotate(-360deg); } }
+  .wru-orbit { position: absolute; transform: translate(-50%, -50%); animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform; }
+  .wru-orbit-path { position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(120, 150, 170, 0.16); }
+  .wru-orbit-dot { position: absolute; left: 50%; top: 50%; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
 
   .wru-content {
     position: relative; z-index: 1; width: 100%; max-width: 920px;
