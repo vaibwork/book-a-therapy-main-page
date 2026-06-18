@@ -2,6 +2,7 @@
   "appId": "com.bookatherapy.hub",
   "appName": "BookaTherapy",
   "webDir": "dist",
+  "backgroundColor": "#ffffff",
   "server": {
     "url": "https://app.bookatherapy.com",
     "androidScheme": "https",
@@ -24,13 +25,17 @@
     "limitsNavigationsToAppBoundDomains": false
   },
   "android": {
-    "allowMixedContent": false
+    "allowMixedContent": false,
+    "backgroundColor": "#ffffff"
   },
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 1000,
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
       "backgroundColor": "#ffffff",
-      "showSpinner": false,
+      "showSpinner": true,
+      "spinnerColor": "#98c454",
+      "androidSpinnerStyle": "large",
       "androidScaleType": "CENTER_CROP"
     },
     "StatusBar": {
