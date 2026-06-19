@@ -4,6 +4,7 @@
   "webDir": "dist",
   "backgroundColor": "#ffffff",
   "server": {
+    "url": "https://app.bookatherapy.com",
     "androidScheme": "https",
     "cleartext": false,
     "allowNavigation": [
