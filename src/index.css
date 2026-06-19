@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+/* Manrope is loaded via <link rel="preconnect"> + stylesheet in index.html (faster first paint). */
 
 /* ── Design Tokens ── */
 :root {
