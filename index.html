@@ -9,9 +9,9 @@
       // (.env.development for local dev, .env.production for live).
       (function () {
         var routes = {
-          "/patient": "%VITE_CUSTOMER_URL%",
-          "/practitioner": "%VITE_PRACTITIONER_URL%",
-          "/clinic": "%VITE_CLINIC_URL%",
+          "/patient": "%VITE_CUSTOMER_URL%/book",
+          "/practitioner": "%VITE_PRACTITIONER_URL%/login",
+          "/clinic": "%VITE_CLINIC_URL%/clinic-signups",
         };
         var dest = routes[location.pathname.replace(/\/+$/, "")];
         if (dest && dest.charAt(0) !== "%") location.replace(dest);
