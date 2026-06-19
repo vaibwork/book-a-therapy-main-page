@@ -748,12 +748,22 @@ const CSS = `
   .wru-sub { margin-top: 10px; font-size: 1.05rem; color: var(--text-muted); }
 
   .wru-grid { margin-top: 38px; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  /* Mobile: fit the whole picker on ONE screen (no scroll) — compact row cards */
   @media (max-width: 720px) {
-    .wru-grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; margin-top: 26px; gap: 14px; }
-    .wru-title { margin-top: 24px; }
-    .wru-sub { font-size: 1rem; }
-    .wru-card { padding: 20px 18px; }
-    .wru-foot { margin-top: 24px; }
+    .wru-root { padding: 18px 14px; }
+    .wru-logo-chip { padding: 11px 22px; border-radius: 16px; }
+    .wru-logo { width: clamp(135px, 42vw, 185px); }
+    .wru-title { margin-top: 14px; font-size: clamp(1.5rem, 6vw, 2rem); }
+    .wru-sub { display: none; }
+    .wru-grid { grid-template-columns: 1fr; max-width: 460px; margin-inline: auto; margin-top: 16px; gap: 10px; }
+    .wru-card { padding: 12px 14px; border-radius: 16px; gap: 3px; }
+    .wru-card-hit { flex-direction: row; align-items: center; gap: 12px; }
+    .wru-card-icon { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; }
+    .wru-card-title { flex: 1; font-size: 1.02rem; }
+    .wru-card-desc { display: none; }
+    .wru-card-cta { flex-shrink: 0; font-size: 0.8rem; }
+    .wru-learn { margin-top: 2px; font-size: 0.8rem; padding: 2px 0; }
+    .wru-foot { display: none; }
   }
 
   .wru-card {
