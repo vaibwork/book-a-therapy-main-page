@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, useAnimationControls } from "framer-motion";
-import { Heart, UserCheck, Building2, ArrowRight, ArrowLeft } from "lucide-react";
+import { Heart, UserCheck, Building2, ArrowRight, ArrowLeft, Check, X } from "lucide-react";
 import logo from "../assets/logo.jpg";
 
 // Real portal destinations (baked in at build from .env.production). The /patient
@@ -23,6 +23,17 @@ const ROLES = [
     solid: "#98c454",
     glow: "rgba(152, 196, 84, 0.35)",
     tint: "rgba(152, 196, 84, 0.12)",
+    onSolid: "#16270a",
+    learn: {
+      tag: "Find the right massage therapist, fast.",
+      points: [
+        "Browse trusted, licensed therapists near you",
+        "See real availability and book in a few taps",
+        "Pay securely online",
+        "Manage or reschedule anytime",
+      ],
+      cta: "Start booking",
+    },
   },
   {
     id: "practitioner",
@@ -34,6 +45,17 @@ const ROLES = [
     solid: "#252f4f",
     glow: "rgba(37, 47, 79, 0.28)",
     tint: "rgba(37, 47, 79, 0.10)",
+    onSolid: "#ffffff",
+    learn: {
+      tag: "Grow your practice, less admin.",
+      points: [
+        "Get discovered by new clients nearby",
+        "Manage appointments, schedule and notes in one place",
+        "Let clients book you online 24/7",
+        "Keep everything organised as you grow",
+      ],
+      cta: "Practitioner login",
+    },
   },
   {
     id: "clinic",
@@ -45,6 +67,17 @@ const ROLES = [
     solid: "#43829e",
     glow: "rgba(67, 130, 158, 0.3)",
     tint: "rgba(67, 130, 158, 0.12)",
+    onSolid: "#ffffff",
+    learn: {
+      tag: "Run your whole clinic in one place.",
+      points: [
+        "List your clinic and your team",
+        "Manage all bookings and therapists together",
+        "Track check-ins and daily schedules",
+        "Reach more clients online",
+      ],
+      cta: "Clinic sign up / login",
+    },
   },
 ];
 
@@ -81,6 +114,7 @@ export default function WhoAreYou() {
   const [pick, setPick] = useState(null); // { id, name, dest, x, y, solid, scale }
   const [phase, setPhase] = useState("idle"); // idle -> cover -> loading
   const [percent, setPercent] = useState(0);
+  const [info, setInfo] = useState(null); // role whose "Learn more" popup is open
 
   // Remembered portal: if the user picked one before, jump straight to its launch
   // screen on open — unless they stepped back to the picker earlier this session.
@@ -136,16 +170,16 @@ export default function WhoAreYou() {
     return () => cancelAnimationFrame(raf);
   }, [phase]);
 
-  const handlePick = (e, role) => {
-    e.preventDefault();
+  const launchPortal = (role, x, y) => {
     if (phase !== "idle") return;
-    const x = e.clientX || window.innerWidth / 2;
-    const y = e.clientY || window.innerHeight / 2;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const far = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y));
+    const px = x ?? vw / 2;
+    const py = y ?? vh / 2;
+    const far = Math.hypot(Math.max(px, vw - px), Math.max(py, vh - py));
     const scale = (far * 2) / COVER_BASE + 1.3;
-    setPick({ id: role.id, name: role.name, dest: DEST[role.id], x, y, solid: role.solid, scale });
+    setInfo(null);
+    setPick({ id: role.id, name: role.name, dest: DEST[role.id], x: px, y: py, solid: role.solid, scale });
     try {
       localStorage.setItem(PORTAL_KEY, role.id); // remember for next time
     } catch {
@@ -154,6 +188,21 @@ export default function WhoAreYou() {
     setPhase("cover");
     controls.start("hide");
   };
+
+  const handlePick = (e, role) => {
+    e.preventDefault();
+    launchPortal(role, e.clientX, e.clientY);
+  };
+
+  // Close the Learn-more popup on Escape.
+  useEffect(() => {
+    if (!info) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setInfo(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [info]);
 
   // "Back to portals": cancel the redirect, forget the saved choice, show the picker.
   const handleBack = () => {
@@ -464,27 +513,34 @@ export default function WhoAreYou() {
           {ROLES.map((role) => {
             const { id, label, desc, Icon, accent, glow, tint } = role;
             return (
-              <motion.a
+              <motion.div
                 key={id}
-                href={DEST[id]}
-                onClick={(e) => handlePick(e, role)}
                 className="wru-card"
                 variants={cardVar}
                 custom={pick?.id === id}
                 whileHover={{ y: -8, boxShadow: `0 26px 52px ${glow}` }}
-                whileTap={{ scale: 0.985 }}
                 style={{ "--card-accent": accent, "--card-tint": tint }}
               >
                 <span className="wru-card-bar" />
-                <span className="wru-card-icon">
-                  <Icon size={26} strokeWidth={2.2} />
-                </span>
-                <span className="wru-card-title">{label}</span>
-                <span className="wru-card-desc">{desc}</span>
-                <span className="wru-card-cta">
-                  Continue <ArrowRight size={17} />
-                </span>
-              </motion.a>
+                <a
+                  href={DEST[id]}
+                  onClick={(e) => handlePick(e, role)}
+                  className="wru-card-hit"
+                  aria-label={label}
+                >
+                  <span className="wru-card-icon">
+                    <Icon size={26} strokeWidth={2.2} />
+                  </span>
+                  <span className="wru-card-title">{label}</span>
+                  <span className="wru-card-desc">{desc}</span>
+                  <span className="wru-card-cta">
+                    Continue <ArrowRight size={17} />
+                  </span>
+                </a>
+                <button type="button" className="wru-learn" onClick={() => setInfo(role)}>
+                  Learn more <ArrowRight size={14} />
+                </button>
+              </motion.div>
             );
           })}
         </motion.div>
@@ -647,6 +703,51 @@ export default function WhoAreYou() {
           </motion.div>
         </motion.div>
       )}
+
+      {/* "Learn more" popup */}
+      {info && (
+        <motion.div
+          className="wru-info"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setInfo(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <motion.div
+            className="wru-info-card"
+            style={{ "--card-accent": info.accent, "--card-tint": info.tint }}
+            initial={{ opacity: 0, y: 22, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 150, damping: 18 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button type="button" className="wru-info-close" onClick={() => setInfo(null)} aria-label="Close">
+              <X size={18} />
+            </button>
+            <span className="wru-info-icon">
+              <info.Icon size={26} strokeWidth={2.2} />
+            </span>
+            <h2 className="wru-info-title">For {info.name}s</h2>
+            <p className="wru-info-tag">{info.learn.tag}</p>
+            <ul className="wru-info-list">
+              {info.learn.points.map((p) => (
+                <li key={p}>
+                  <Check size={17} strokeWidth={2.6} /> {p}
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              className="wru-info-cta"
+              style={{ background: info.solid, color: info.onSolid }}
+              onClick={() => launchPortal(info)}
+            >
+              {info.learn.cta} <ArrowRight size={17} />
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
     </main>
   );
 }
@@ -736,6 +837,50 @@ const CSS = `
   .wru-card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 700; color: var(--card-accent); }
   .wru-card-cta svg { transition: transform 0.25s ease; }
   .wru-card:hover .wru-card-cta svg { transform: translateX(5px); }
+
+  .wru-card-hit { display: flex; flex-direction: column; gap: 12px; flex: 1; text-decoration: none; color: inherit; }
+  .wru-learn {
+    align-self: flex-start; margin-top: 4px;
+    display: inline-flex; align-items: center; gap: 4px;
+    background: none; border: none; padding: 6px 0;
+    font-family: 'Manrope', sans-serif; font-size: 0.85rem; font-weight: 700;
+    color: var(--card-accent); cursor: pointer;
+    border-bottom: 1.5px solid transparent; transition: border-color 0.2s ease;
+  }
+  .wru-learn:hover { border-bottom-color: var(--card-accent); }
+
+  /* "Learn more" popup */
+  .wru-info {
+    position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center;
+    padding: 20px; background: rgba(20, 28, 46, 0.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  }
+  .wru-info-card {
+    position: relative; width: 100%; max-width: 440px; text-align: left;
+    background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px;
+    padding: 30px 26px 26px; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.32);
+  }
+  .wru-info-close {
+    position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+    border: none; background: var(--bg-secondary); color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;
+  }
+  .wru-info-close:hover { color: var(--text-primary); }
+  .wru-info-icon {
+    width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    background: var(--card-tint); color: var(--card-accent); margin-bottom: 16px;
+  }
+  .wru-info-title { font-size: 1.35rem; font-weight: 800; color: var(--text-primary); }
+  .wru-info-tag { margin-top: 4px; font-size: 1rem; font-weight: 600; color: var(--card-accent); }
+  .wru-info-list { list-style: none; margin: 18px 0 22px; display: flex; flex-direction: column; gap: 11px; }
+  .wru-info-list li { display: flex; align-items: flex-start; gap: 9px; font-size: 0.93rem; line-height: 1.45; color: var(--text-secondary); }
+  .wru-info-list li svg { color: var(--card-accent); flex-shrink: 0; margin-top: 2px; }
+  .wru-info-cta {
+    width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px; border-radius: 12px; border: none; cursor: pointer;
+    font-family: 'Manrope', sans-serif; font-size: 0.95rem; font-weight: 700;
+    transition: transform 0.15s ease, filter 0.2s ease;
+  }
+  .wru-info-cta:hover { filter: brightness(1.05); transform: translateY(-1px); }
 
   .wru-foot { margin-top: 34px; font-size: 0.8rem; letter-spacing: 0.04em; color: var(--text-muted); }
 
