@@ -289,15 +289,46 @@ export default function WhoAreYou() {
   // Soft, slow-drifting motes for a soothing, spa-like feel.
   const motes = useMemo(() => {
     const r = (a, b) => a + Math.random() * (b - a);
-    return Array.from({ length: 16 }, (_, i) => ({
+    return Array.from({ length: 28 }, (_, i) => ({
       id: i,
       left: +r(0, 100).toFixed(2),
       top: +r(0, 100).toFixed(2),
-      size: Math.round(r(6, 18)),
-      opacity: +r(0.12, 0.4).toFixed(2),
+      size: Math.round(r(5, 16)),
+      opacity: +r(0.1, 0.4).toFixed(2),
       dur: +r(8, 16).toFixed(1),
       delay: +(-r(0, 14)).toFixed(1),
-      drift: Math.round(r(-24, 24)),
+      drift: Math.round(r(-22, 22)),
+    }));
+  }, []);
+
+  // Soft bubbles rising slowly — fills the screen with a calm spa feel.
+  const launchBubbles = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      left: +r(0, 100).toFixed(2),
+      size: Math.round(r(14, 72)),
+      fill: Math.random() > 0.5,
+      opacity: +r(0.08, 0.2).toFixed(2),
+      sway: Math.round(r(-28, 28)),
+      dur: +r(13, 26).toFixed(1),
+      delay: +(-r(0, 24)).toFixed(1),
+    }));
+  }, []);
+
+  // Large, very faint rings drifting in the background for depth.
+  const launchRings = useMemo(() => {
+    const r = (a, b) => a + Math.random() * (b - a);
+    return Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      left: +r(5, 92).toFixed(1),
+      top: +r(8, 88).toFixed(1),
+      size: Math.round(r(120, 280)),
+      opacity: +r(0.08, 0.18).toFixed(2),
+      dx: Math.round(r(-40, 40)),
+      dy: Math.round(r(-30, 30)),
+      dur: +r(16, 28).toFixed(1),
+      delay: +(-r(0, 16)).toFixed(1),
     }));
   }, []);
 
@@ -513,6 +544,48 @@ export default function WhoAreYou() {
           {/* soft ambient glows */}
           <div className="wru-launch-glow wru-launch-glow--1" />
           <div className="wru-launch-glow wru-launch-glow--2" />
+
+          {/* large faint drifting rings (depth) */}
+          <div className="wru-layer">
+            {launchRings.map((rg) => (
+              <span
+                key={rg.id}
+                className="wru-lring"
+                style={{
+                  left: `${rg.left}%`,
+                  top: `${rg.top}%`,
+                  width: rg.size,
+                  height: rg.size,
+                  opacity: rg.opacity,
+                  "--dx": `${rg.dx}px`,
+                  "--dy": `${rg.dy}px`,
+                  animationDuration: `${rg.dur}s`,
+                  animationDelay: `${rg.delay}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* soft rising bubbles */}
+          <div className="wru-layer">
+            {launchBubbles.map((b) => (
+              <span
+                key={b.id}
+                className="wru-lbubble"
+                style={{
+                  left: `${b.left}%`,
+                  width: b.size,
+                  height: b.size,
+                  "--sway": `${b.sway}px`,
+                  animationDuration: `${b.dur}s`,
+                  animationDelay: `${b.delay}s`,
+                  ...(b.fill
+                    ? { background: `rgba(255,255,255,${b.opacity})` }
+                    : { border: `1.5px solid rgba(255,255,255,${(b.opacity + 0.1).toFixed(2)})`, background: "transparent" }),
+                }}
+              />
+            ))}
+          </div>
 
           {/* slow, soft drifting motes */}
           <div className="wru-layer">
@@ -783,6 +856,20 @@ const CSS = `
   .wru-launch-glow--2 { width: 50vmin; height: 50vmin; right: 6%; bottom: 10%; background: rgba(255,255,255,0.22); animation: wru-soft-pulse 9s ease-in-out infinite 1.5s; }
 
   .wru-mote { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.85); box-shadow: 0 0 8px rgba(255,255,255,0.5); animation: wru-mote ease-in-out infinite; will-change: transform; }
+
+  @keyframes wru-lrise {
+    0% { transform: translate(0, 12vh) scale(0.9); opacity: 0; }
+    14% { opacity: 1; }
+    88% { opacity: 1; }
+    100% { transform: translate(var(--sway), -108vh) scale(1.06); opacity: 0; }
+  }
+  .wru-lbubble { position: absolute; bottom: 0; border-radius: 50%; filter: blur(0.4px); animation: wru-lrise linear infinite; will-change: transform, opacity; }
+
+  @keyframes wru-ldrift {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.12); }
+  }
+  .wru-lring { position: absolute; border-radius: 50%; border: 1.5px solid #fff; transform: translate(-50%, -50%); animation: wru-ldrift ease-in-out infinite; will-change: transform; }
 
   .wru-launch-center { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px; }
   .wru-breathe { position: relative; display: flex; align-items: center; justify-content: center; width: min(300px, 74vmin); height: min(300px, 74vmin); }
