@@ -6,12 +6,12 @@ import logo from "../assets/logo.jpg";
 // Real portal destinations (baked in at build from .env.production). The /patient
 // style paths stay as the <a href> fallback so right-click / new-tab still work;
 // the actual navigation after the launch animation uses these direct URLs.
-// Land each role straight on its action page. Clinic stays on its root for now because
-// its /login and /clinic-signups pages currently 504 (time out) in production.
+// Land each role straight on its action page: Patient -> booking, Practitioner -> login,
+// Clinic -> onboarding (sign-up). Swap clinic to "/login" if existing-clinic login is preferred.
 const DEST = {
   patient: `${import.meta.env.VITE_CUSTOMER_URL || ""}/book`,
   practitioner: `${import.meta.env.VITE_PRACTITIONER_URL || ""}/login`,
-  clinic: import.meta.env.VITE_CLINIC_URL || "/clinic",
+  clinic: `${import.meta.env.VITE_CLINIC_URL || ""}/clinic-signups`,
 };
 
 const ROLES = [
