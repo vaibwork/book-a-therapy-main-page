@@ -5,9 +5,9 @@ same approach as the patient app, with the redirect behaviour the customer asked
 
 ## How it behaves (no address bar, ever)
 
-- The app **loads the live hub directly** from `https://app.bookatherapy.com`
-  (`capacitor.config.json → server.url`) as its first screen, so the hub UI always matches
-  production. (A bundled copy of `dist` ships as a fallback but isn't used while online.)
+- The **hub launcher is bundled inside the app** (`webDir: dist`) so it opens **instantly,
+  even offline** — no network wait on launch. (`server.url` was removed for speed; if you ever
+  want the hub to auto-update from the live site instead, re-add `"url": "https://app.bookatherapy.com"`.)
 - When the user taps **Patient / Practitioner / Clinic**, the page redirects to the live
   portal (`www` / `practitioner` / `clinic` `.bookatherapy.com`).
 - Those hosts (plus Stripe + Mapbox/Google Maps) are whitelisted in
@@ -18,9 +18,10 @@ same approach as the patient app, with the redirect behaviour the customer asked
 - Because each portal loads at its **real origin**, login/bearer-token auth, the
   `api.bookatherapy.com` calls (CORS), Stripe and maps all work exactly as in a browser.
 
-**Updates:** because the app loads the live site, a web deploy of the **hub or any portal**
-updates the app instantly with no resubmission. You only rebuild the app to change native
-config — app id, icon, permissions, or the `server.url` itself.
+**Updates:** the **portals** still load live (via `allowNavigation`), so any portal web deploy
+reaches the app instantly. Changes to the **hub launcher screen itself** now need an app
+rebuild (`npm run build && npx cap sync` + rebuild) — the website still updates instantly for
+browser users.
 
 - **App ID:** `com.bookatherapy.hub`  ·  **Name:** BookaTherapy
   - This is intentionally separate from the patient-only app (`com.bookatherapy.app`) so
